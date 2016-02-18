@@ -26,16 +26,16 @@
 #include <cv.h>
 #include <highgui.h>
 
-#include <but_velodyne_odom/VelodynePointCloud.h>
-#include <but_velodyne_odom/KeypointsCorrespondenceProjector.h>
-#include <but_velodyne_odom/Correspondence.h>
-#include <but_velodyne_odom/Stopwatch.h>
+#include <but_velodyne/VelodynePointCloud.h>
+#include <but_velodyne/KeypointsCorrespondenceProjector.h>
+#include <but_velodyne/Correspondence.h>
+#include <but_velodyne/Stopwatch.h>
 
 using namespace std;
 using namespace cv;
 
 
-namespace but_velodyne_odom {
+namespace but_velodyne {
 
 void drawCorrespondence(Mat &img, Point2f projected, Point2f keypoint) {
   RNG& rng=theRNG();
@@ -66,7 +66,7 @@ void draw3DTo2DMatches(const Mat &image,
 vector<Correspondence3D> KeypointsCorrespondenceProjector::findLidarCorrespondences()
 {
   Stopwatch stopwatch;
-  stopwatch.start();
+  stopwatch.restart();
 
   cv::flann::KDTreeIndexParams index_params(1);
   Mat source_image_keypoints = getTrainingPointsFromImageMatches(SOURCE);
@@ -97,7 +97,7 @@ vector<Correspondence3D> KeypointsCorrespondenceProjector::findLidarCorresponden
                     target_indicies);*/
 
   cerr << "Nearest projected points found in: " << stopwatch.elapsed() << "[sec]" << endl;
-  stopwatch.start();
+  stopwatch.restart();
   vector<Correspondence3D> final_correspondences = mergeCorrespondences(source_indicies,
                                                                        source_distances,
                                                                        target_indicies,

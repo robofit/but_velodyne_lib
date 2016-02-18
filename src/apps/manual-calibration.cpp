@@ -30,13 +30,13 @@
 #include <pcl/common/eigen.h>
 #include <pcl/common/transforms.h>
 
-#include <but_velodyne_odom/VelodynePointCloud.h>
+#include <but_velodyne/VelodynePointCloud.h>
 
 using namespace std;
 using namespace cv;
 using namespace pcl;
 using namespace velodyne_pointcloud;
-using namespace but_velodyne_odom;
+using namespace but_velodyne;
 
 class CommonException : public exception {
 public:

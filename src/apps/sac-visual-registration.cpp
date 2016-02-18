@@ -37,18 +37,18 @@
 #include <pcl/common/transforms.h>
 #include <pcl/registration/correspondence_rejection_sample_consensus.h>
 
-#include <but_velodyne_odom/Correspondence.h>
-#include <but_velodyne_odom/KeypointsCorrespondenceProjector.h>
-#include <but_velodyne_odom/VelodynePointCloud.h>
-#include <but_velodyne_odom/Visualizer2DCorrespondences.h>
-#include <but_velodyne_odom/Stopwatch.h>
-#include <but_velodyne_odom/Visualizer3D.h>
+#include <but_velodyne/Correspondence.h>
+#include <but_velodyne/KeypointsCorrespondenceProjector.h>
+#include <but_velodyne/VelodynePointCloud.h>
+#include <but_velodyne/Visualizer2DCorrespondences.h>
+#include <but_velodyne/Stopwatch.h>
+#include <but_velodyne/Visualizer3D.h>
 
 using namespace std;
 using namespace pcl;
 using namespace velodyne_pointcloud;
 using namespace cv;
-using namespace but_velodyne_odom;
+using namespace but_velodyne;
 
 // obtained via manual-calibration application (considered static camera-Velodyne setup)
 const Eigen::Affine3f CALIBRATION = getTransformation(-0.04, -0.19, -0.18, 0.04, 0.02, -0.035);
@@ -131,7 +131,6 @@ int main(int argc, char *argv[])
   /* ******************************************************************** */
 
   Stopwatch stopwatch;
-  stopwatch.start();
 
   vector<Correspondence2D> image_correspondences =
       findImageCorrespondences(source_image, target_image);

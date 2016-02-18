@@ -22,10 +22,11 @@
  */
 
 #include <cmath>
+#include <boost/range/numeric.hpp>
 
-#include <but_velodyne_odom/Termination.h>
+#include <but_velodyne/Termination.h>
 
-namespace but_velodyne_odom
+namespace but_velodyne
 {
 
 Termination::Termination(int min_iterations, int max_iterations, float max_time_spent,
@@ -33,7 +34,7 @@ Termination::Termination(int min_iterations, int max_iterations, float max_time_
               err_deviation(min_iterations), min_error(min_error),
               max_time_spent(max_time_spent), max_iterations(max_iterations),
               iterations(0), min_err_deviation(min_err_deviation) {
-  stopwatch.start();
+  stopwatch.restart();
   last_error = INFINITY;
 }
 
@@ -59,4 +60,18 @@ bool Termination::operator()() {
   return false;
 }
 
-} /* namespace but_velodyne_odom */
+float ErrorDeviation::getDeviation() const {
+  float sum_squares = 0;
+  float mean = getMean();
+  for(boost::circular_buffer<float>::const_iterator e = last_errors.begin();
+      e < last_errors.end(); e++) {
+    sum_squares += pow(*e - mean, 2);
+  }
+  return sqrt(sum_squares / last_errors.size());
+}
+
+float ErrorDeviation::getMean() const {
+  return std::accumulate(last_errors.begin(), last_errors.end(), 0.0) / last_errors.size();
+}
+
+} /* namespace but_velodyne */

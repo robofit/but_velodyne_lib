@@ -31,3 +31,4 @@ Detailed **description** of algorithm can be found in publication (see *doc/ICRA
 *Velas, M. Spanel, M. Herout, A.: Collar Line Segments for Fast Odometry Estimation from Velodyne Point Clouds, ICRA 2016*
 
 For **demonstration**, script *scripts/demo.sh* has been prepared. It requires internet connection (for obtaining data samples) and successfully built library. Demo aligns 5 data frames of Velodyne LiDAR and displays resulting 3D map.
+

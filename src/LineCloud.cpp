@@ -22,19 +22,38 @@
  */
 
 #include <algorithm>
+#include <boost/algorithm/string.hpp>
+#include <boost/program_options/errors.hpp>
 
 #include <pcl/point_types.h>
-
-// added:
 #include <pcl/features/normal_3d.h>
 
-#include <but_velodyne_odom/LineCloud.h>
+#include <but_velodyne/LineCloud.h>
 
 using namespace std;
 using namespace pcl;
 
-namespace but_velodyne_odom
+namespace but_velodyne
 {
+
+std::istream& operator>> (std::istream &in, LineCloud::PreservedFactorBy &factor_type) {
+  string token;
+  in >> token;
+
+  boost::to_upper(token);
+
+  if (token == "ANGLE_WITH_GROUND") {
+    factor_type = LineCloud::ANGLE_WITH_GROUND;
+  } else if (token == "NONE") {
+    factor_type = LineCloud::NONE;
+  } else {
+      throw boost::program_options::validation_error(boost::program_options::validation_error::invalid_option_value,
+                                                     "lines_preserved_factor_by");
+  }
+
+  return in;
+}
+
 
 LineCloud::LineCloud(const PolarGridOfClouds &polar_grid,
                      const int lines_per_cell_pair_generated,
@@ -102,4 +121,31 @@ float LineCloud::sinOfPlaneAngleWithGround(const VelodynePointCloud &points) {
   return (isnan(angle_sin)) ? 1.0 : angle_sin;
 }
 
-} /* namespace but_velodyne_odom */
+void LineCloud::transform(const Eigen::Matrix4f &transformation, LineCloud &output) const {
+  output.line_cloud.clear();
+  for(std::vector<PointCloudLine>::const_iterator line = line_cloud.begin();
+      line < line_cloud.end(); line++) {
+    output.line_cloud.push_back(line->transform(transformation));
+  }
+  pcl::transformPointCloud(line_middles, output.line_middles, transformation);
+}
+
+void LineCloud::transform(const Eigen::Matrix4f &transformation) {
+  for(std::vector<PointCloudLine>::iterator line = line_cloud.begin();
+      line < line_cloud.end(); line++) {
+    *line = line->transform(transformation);
+  }
+  pcl::transformPointCloud(line_middles, line_middles, transformation);
+}
+
+float LineCloud::getPreservedFactor(const VelodynePointCloud &all_points) {
+  switch(preservedFactorType) {
+    case ANGLE_WITH_GROUND:
+      return sinOfPlaneAngleWithGround(all_points) + 1.0;
+    default:
+      assert(preservedFactorType == NONE);
+      return 1.0;
+  }
+}
+
+} /* namespace but_velodyne */

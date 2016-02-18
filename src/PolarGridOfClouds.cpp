@@ -26,13 +26,13 @@
 
 #include <pcl/common/transforms.h>
 
-#include <but_velodyne_odom/PolarGridOfClouds.h>
-#include <but_velodyne_odom/Visualizer3D.h>
+#include <but_velodyne/PolarGridOfClouds.h>
+#include <but_velodyne/Visualizer3D.h>
 
 using namespace std;
 using namespace pcl;
 
-namespace but_velodyne_odom {
+namespace but_velodyne {
 
 PolarGridOfClouds::PolarGridOfClouds(
     const pcl::PointCloud<velodyne_pointcloud::PointXYZIR> &point_cloud) {

@@ -30,9 +30,12 @@
 #include <boost/circular_buffer.hpp>
 #include <boost/range/numeric.hpp>
 
-namespace but_velodyne_odom
+namespace but_velodyne
 {
 
+/**!
+ * Encapsulation of translation and rotation parameters.
+ */
 class MoveParameters
 {
 public:
@@ -49,72 +52,33 @@ public:
     pcl::getEulerAngles(affine, roll, pitch, yaw);
   }
 
-  MoveParameters operator +(const MoveParameters &other) const {
-    return MoveParameters(
-      x + other.x,
-      y + other.y,
-      z + other.z,
-      roll + other.roll,
-      pitch + other.pitch,
-      yaw + other.yaw);
-  }
+  MoveParameters operator +(const MoveParameters &other) const;
 
-  MoveParameters operator *(float factor) const {
-    return MoveParameters(
-        x * factor,
-        y * factor,
-        z * factor,
-        roll * factor,
-        pitch * factor,
-        yaw * factor);
-  }
+  MoveParameters operator *(float factor) const;
 
-  MoveParameters operator -(const MoveParameters &other) const {
-    return *this + (other * -1.0f);
-  }
+  MoveParameters operator -(const MoveParameters &other) const;
 
-  void operator +=(const MoveParameters &other) {
-    x += other.x;
-    y += other.y;
-    z += other.z;
-    roll += other.roll;
-    pitch += other.pitch;
-    yaw += other.yaw;
-  }
+  void operator +=(const MoveParameters &other);
 
-  void operator /=(float factor) {
-    x /= factor;
-    y /= factor;
-    z /= factor;
-    roll /= factor;
-    pitch /= factor;
-    yaw /= factor;
-  }
+  void operator /=(float factor);
 
-  void operator *=(float factor) {
-    x *= factor;
-    y *= factor;
-    z *= factor;
-    roll *= factor;
-    pitch *= factor;
-    yaw *= factor;
-  }
+  void operator *=(float factor);
 
-  void setZeros() {
-    *this *= 0.0;
-  }
+  /**!
+   * Reset all parameters to zero.
+   */
+  void setZeros();
 
-  cv::Mat toCvMat() const {
-    cv::Mat measurements(6, 1, CV_64F);
-    measurements.at<double>(0) = x;
-    measurements.at<double>(1) = y;
-    measurements.at<double>(2) = z;
-    measurements.at<double>(3) = roll;
-    measurements.at<double>(4) = pitch;
-    measurements.at<double>(5) = yaw;
-    return measurements;
-  }
+  /**!
+   * Convert to OpenCV matrix of size 6x1 (column)
+   */
+  cv::Mat toCvMat() const;
 
+  /**!
+   * Compute mean and covariance of multiple sets of move parameters.
+   *
+   * @param measurements [input] parameters of multiple moves
+   */
   static void getGaussDistributionOf(const std::vector<MoveParameters> &meassurements,
                                      MoveParameters &output_mean,
                                      cv::Mat &output_covariance) {
@@ -132,10 +96,15 @@ public:
       output_covariance += diff * diff.t();
     }
     output_covariance /= meassurements.size();
-    std::cerr << "Covariance:" << std::endl;
-    std::cerr << output_covariance << std::endl;
   }
 
+  /**!
+   * Estimate approximation of covariance matrix for pose graph.
+   *
+   * @param t_diff approximate error of translation parameters
+   * @param r_diff approximate error of rotation parameters
+   * @param output_covariance [output]
+   */
   static void getDummyCovariance(const float t_diff,    // [m]
                                  const float r_diff,    // [rad]
                                  cv::Mat &output_covariance) {
@@ -147,14 +116,29 @@ public:
   float x, y, z, roll, yaw, pitch;
 };
 
+/**!
+ * Predictor of future odometry based on the previous registrations.
+ */
 class MoveEstimator {
 public:
+
   virtual ~MoveEstimator() {
   }
+
+  /**!
+   * Add new observation.
+   */
   virtual void addMeassurement(const MoveParameters &params) =0;
+
+  /**!
+   * Predict future odometry
+   */
   virtual MoveParameters predict() =0;
 };
 
+/**!
+ * Simple linear predictor.
+ */
 class LinearMoveEstimator : public MoveEstimator {
 public:
   LinearMoveEstimator(int history_size);
@@ -164,6 +148,9 @@ private:
   boost::circular_buffer<MoveParameters> last_measurements;
 };
 
+/**!
+ * Kalman filter for prediction
+ */
 class KalmanMoveEstimator : public MoveEstimator {
 public:
   KalmanMoveEstimator(const float process_noise, const float measurement_noise,
@@ -180,16 +167,32 @@ private:
   static const float TIME_DELTA = 0.1;         // 10fps
 };
 
+/**!
+ * Prediction of future odometry using existing estimator
+ */
 class MoveEstimation
 {
 public:
+
+  /**!
+   * @param estimator linear estimator or Kalman filter
+   */
   MoveEstimation(MoveEstimator &estimator);
+
+  /**!
+   * Add new observation (after complete registration)
+   */
   void addMeassurement(Eigen::Matrix4f &m);
+
+  /**!
+   * @return prediction of future move
+   */
   Eigen::Matrix4f predict();
+
 private:
   MoveEstimator &estimator;
 };
 
-} /* namespace but_velodyne_odom */
+} /* namespace but_velodyne */
 
 #endif /* MOVEESTIMATION_H_ */

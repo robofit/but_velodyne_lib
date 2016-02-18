@@ -27,10 +27,10 @@
 #include <pcl/common/transforms.h>
 #include <pcl/visualization/cloud_viewer.h>
 
-#include <but_velodyne_odom/KittiUtils.h>
-#include <but_velodyne_odom/Visualizer3D.h>
+#include <but_velodyne/KittiUtils.h>
+#include <but_velodyne/Visualizer3D.h>
 
-namespace but_velodyne_odom
+namespace but_velodyne
 {
 
 using namespace cv;
@@ -51,6 +51,19 @@ Visualizer3D::Visualizer3D() :
 
 Visualizer3D::~Visualizer3D() {
   close();
+}
+
+Visualizer3D& Visualizer3D::addColorPointCloud(
+    const pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud,
+    const Eigen::Matrix4f &transformation) {
+
+  pcl::transformPointCloud(*cloud, *cloud, transformation);
+  pcl::visualization::PointCloudColorHandlerRGBField<pcl::PointXYZRGB> rgb_vis(cloud);
+  std::string id = getId("cloud");
+  viewer->addPointCloud<pcl::PointXYZRGB>(cloud, rgb_vis, id);
+  viewer->setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE,
+                                           2, id);
+  return *this;
 }
 
 Visualizer3D& Visualizer3D::addLine(const Correspondence3D &line) {
@@ -107,9 +120,8 @@ Visualizer3D& Visualizer3D::addLines(const LineCloud &lineCloud) {
   return addLines(lineCloud.getLines());
 }
 
-Visualizer3D& Visualizer3D::saveSnapshot(const std::string &filename) {
+void Visualizer3D::saveSnapshot(const std::string &filename) {
   viewer->saveScreenshot(filename);
-  return *this;
 }
 
 Visualizer3D& Visualizer3D::addSenzor(PointXYZ position) {
@@ -168,4 +180,30 @@ Visualizer3D& Visualizer3D::addPosesDots(const vector<Eigen::Affine3f> &poses) {
   return addPointCloud(poses_cloud);
 }
 
-} /* namespace but_velodyne_odom */
+Visualizer3D& Visualizer3D::setColor(unsigned r, unsigned g, unsigned b) {
+  color_stack.push_back(r);
+  color_stack.push_back(g);
+  color_stack.push_back(b);
+  return *this;
+}
+
+std::string Visualizer3D::getId(const string &what) {
+  std::stringstream ss;
+  ss << what << "_" << identifier++;
+  all_identifiers.push_back(ss.str());
+  return ss.str();
+}
+
+double Visualizer3D::rngF() {
+  return rng.uniform(0.0, 1.0);
+}
+
+unsigned Visualizer3D::rngU() {
+  if(color_stack.size() > color_index) {
+    return color_stack[color_index++];
+  } else {
+    return rng(256);
+  }
+}
+
+} /* namespace but_velodyne */

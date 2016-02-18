@@ -34,12 +34,23 @@
 #include <pcl/common/eigen.h>
 #include <pcl/common/transforms.h>
 
-namespace but_velodyne_odom
+namespace but_velodyne
 {
 
+/**!
+ * Auxiliary class for handling KITTI pose files
+ */
 class KittiUtils
 {
 public:
+
+  /**!
+   * Load odometry from KITTI pose file.
+   *
+   * @param poses_filename input KITTI pose file
+   * @param fail_when_not_found call exit(.) when file not found
+   * @return poses of sensory platform for whole data sequence
+   */
   static std::vector<Eigen::Affine3f> load_kitti_poses(const std::string poses_filename,
                                                        bool fail_when_not_found = true) {
     std::vector<Eigen::Affine3f> poses;
@@ -73,6 +84,12 @@ public:
     return poses;
   }
 
+  /**!
+   * Save multiple odometry poses to the file.
+   *
+   * @param poses the poses to save
+   * @param stream target output stream
+   */
   static void save_kitti_poses(const std::vector<Eigen::Affine3f> &poses,
                                std::ostream &stream) {
     for(std::vector<Eigen::Affine3f>::const_iterator p = poses.begin();
@@ -81,6 +98,12 @@ public:
     }
   }
 
+  /**!
+   * Save single poses to the file.
+   *
+   * @param pose the pose to save
+   * @param stream target output stream
+   */
   static void save_kitti_pose(const Eigen::Affine3f &pose, std::ostream &stream) {
     for(int r = 0; r < 3; r++) {
       for(int c = 0; c < 4; c++) {
@@ -90,11 +113,18 @@ public:
     stream << std::endl;
   }
 
+  /**!
+   * Pose to PCL point conversion - rotation is omitted.
+   */
   static pcl::PointXYZ positionFromPose(const Eigen::Affine3f &pose) {
     pcl::PointXYZ position(0.0, 0.0, 0.0);
     return pcl::transformPoint(position, pose);
   }
 
+  /**!
+   * @param index index of data frame in sequence
+   * @return filename where LiDAR data (point cloud) is stored
+   */
   static std::string getKittiFrameName(const int index) {
     std::stringstream ss;
     ss << std::setfill('0') << std::setw(6) << index << ".bin";
@@ -102,6 +132,6 @@ public:
   }
 };
 
-} /* namespace but_velodyne_odom */
+} /* namespace but_velodyne */
 
 #endif /* KITTIUTILS_H_ */

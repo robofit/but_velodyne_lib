@@ -27,9 +27,9 @@
 #include <cstdio>
 #include <algorithm>
 
-#include <but_velodyne_odom/VelodynePointCloud.h>
-#include <but_velodyne_odom/Visualizer3D.h>
-#include <but_velodyne_odom/KittiUtils.h>
+#include <but_velodyne/VelodynePointCloud.h>
+#include <but_velodyne/Visualizer3D.h>
+#include <but_velodyne/KittiUtils.h>
 
 #include <cv.h>
 
@@ -45,7 +45,7 @@
 using namespace std;
 using namespace cv;
 using namespace pcl;
-using namespace but_velodyne_odom;
+using namespace but_velodyne;
 
 float CORRECT_LOOP_POSE_TOLERANCE = 3;   // 3m
 int MINIMAL_TIME_OF_LOOP = 20;           // 10s

@@ -26,11 +26,11 @@
 #include <cstdlib>
 #include <cstdio>
 
-#include <but_velodyne_odom/VelodynePointCloud.h>
-#include <but_velodyne_odom/Visualizer3D.h>
-#include <but_velodyne_odom/KittiUtils.h>
-#include <but_velodyne_odom/PolarGridOfClouds.h>
-#include <but_velodyne_odom/LineCloud.h>
+#include <but_velodyne/VelodynePointCloud.h>
+#include <but_velodyne/Visualizer3D.h>
+#include <but_velodyne/KittiUtils.h>
+#include <but_velodyne/PolarGridOfClouds.h>
+#include <but_velodyne/LineCloud.h>
 
 #include <pcl/common/eigen.h>
 #include <pcl/common/transforms.h>
@@ -38,7 +38,7 @@
 using namespace std;
 using namespace pcl;
 using namespace velodyne_pointcloud;
-using namespace but_velodyne_odom;
+using namespace but_velodyne;
 
 void toColor(uchar i, uchar &r, uchar &g, uchar &b) {
   if(i < 128) {

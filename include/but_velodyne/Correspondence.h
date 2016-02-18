@@ -26,15 +26,21 @@
 
 #include <cv.h>
 #include <velodyne_pointcloud/point_types.h>
-#include <but_velodyne_odom/PointCloudLine.h>
+#include <but_velodyne/PointCloudLine.h>
 
-namespace but_velodyne_odom {
+namespace but_velodyne {
 
+/**!
+ * Two ends of correspondence (a.k.a. arrow)
+ */
 enum Direction
 {
   SOURCE, TARGET
 };
 
+/**!
+ * General correspondence between two arbitrary elements.
+ */
 template<class PointTsrc, class PointTarget>
 class Correspondence
 {
@@ -48,14 +54,16 @@ public:
   float quality;
 };
 
+///! correspondence in image(s)
 typedef Correspondence<cv::Point2f, cv::Point2f> Correspondence2D;
+
+///! correspondence between point cloud element and image point
 typedef Correspondence<velodyne_pointcloud::PointXYZIR,
                       cv::Point2f> Correspondence3D2D;
+
+///! correspondence in point cloud(s)
 typedef Correspondence<velodyne_pointcloud::PointXYZIR,
                       velodyne_pointcloud::PointXYZIR> Correspondence3D;
-typedef Correspondence<int, int> CorrespondenceIndex;
-
-typedef Correspondence<PointCloudLine, PointCloudLine> PointCloudLineCorrespondence;
 
 }
 

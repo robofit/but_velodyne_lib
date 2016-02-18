@@ -5,7 +5,7 @@
  *
  * Author: Martin Velas (ivelas@fit.vutbr.cz)
  * Supervised by: Michal Spanel & Adam Herout ({spanel|herout}@fit.vutbr.cz)
- * Date: 24/10/2014
+ * Date: 07/11/2014
  *
  * This file is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -21,24 +21,45 @@
  * along with this file.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef STOPWATCH_H_
-#define STOPWATCH_H_
+#ifndef IMAGELINEDETECTOR_H_
+#define IMAGELINEDETECTOR_H_
 
-#include <ctime>
 
-class Stopwatch {
+#include <cv.h>
+#include <velodyne_pointcloud/point_types.h>
+
+namespace but_velodyne {
+
+/**!
+ * Line segment in the image.
+ */
+class ImageLine {
 public:
-  void start() {
-    start_time = clock();
+  cv::Point p1;         ///! source
+  cv::Point p2;         ///! target
+
+public:
+  ImageLine(cv::Point p1, cv::Point p2) :
+    p1(p1), p2(p2),
+    width(0), precision(0), nfa(0) {
   }
 
-  // [sec]
-  double elapsed() {
-    return double(clock() - start_time) / CLOCKS_PER_SEC;
-  }
+  /**!
+   * @return orientation in x and y direction (difference of target - source point)
+   */
+  Eigen::Vector2f orientation() const;
 
-protected:
-  clock_t start_time;
+  /**!
+   * Evaluates line equation: a*x + b*y + c = 0
+   *
+   * @return a*point.x + b*point.y + c
+   */
+  inline float valueOfEquation(const cv::Point2f &point) const;
+
+private:
+  float width, precision, nfa;
 };
 
-#endif /* STOPWATCH_H_ */
+}
+
+#endif /* IMAGELINEDETECTOR_H_ */

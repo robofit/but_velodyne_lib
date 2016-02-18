@@ -28,14 +28,14 @@
 #include <pcl/common/eigen.h>
 #include <cxeigen.hpp>
 
-#include <but_velodyne_odom/PoseGraphEdge.h>
+#include <but_velodyne/PoseGraphEdge.h>
 
 using namespace cv;
 using namespace std;
 using namespace pcl;
 using namespace Eigen;
 
-namespace but_velodyne_odom
+namespace but_velodyne
 {
 
 // EDGE3D sourceIdx targetIdx 6DOF(6 floats) upper-triange-of-cholesky-cov(21 floats)
@@ -88,4 +88,4 @@ std::istream& operator>>(std::istream& is, PoseGraphEdge& edge) {
   return is;
 }
 
-} /* namespace but_velodyne_odom */
+} /* namespace but_velodyne */

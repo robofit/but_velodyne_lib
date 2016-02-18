@@ -27,14 +27,14 @@
 #include <cstdlib>
 #include <cstdio>
 
-#include <but_velodyne_odom/KittiUtils.h>
+#include <but_velodyne/KittiUtils.h>
 
 #include <pcl/common/eigen.h>
 #include <pcl/common/transforms.h>
 
 using namespace std;
 using namespace pcl;
-using namespace but_velodyne_odom;
+using namespace but_velodyne;
 
 /**
  * @brief converts axis-angle representation to quaternion

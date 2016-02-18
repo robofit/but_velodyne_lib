@@ -28,12 +28,21 @@
 #include <fstream>
 #include <exception>
 
-namespace but_velodyne_odom {
+namespace but_velodyne {
 
+/**!
+ * Additional operations with Eigen types and structures.
+ */
 class EigenUtils {
 
 public:
 
+  /**!
+   * Save Eigen matrix to file
+   *
+   * @param filename destination file
+   * @param m matrix to be saved
+   */
   template<typename MatrixType>
   static void saveMatrix(const char *filename, const MatrixType& m)
   {
@@ -49,6 +58,12 @@ public:
     f.close();
   }
 
+  /**!
+   * Load Eigen matrix from file
+   *
+   * @param filename source file
+   * @param m destination
+   */
   template<typename MatrixType>
   static void loadMatrix(const char *filename, MatrixType& m)
   {
@@ -70,24 +85,44 @@ public:
     f.close();
   }
 
+  /**!
+   * Save Eigen matrix to file
+   *
+   * @param filename destination file
+   * @param m matrix to be saved
+   */
   template<typename MatrixType>
   static void saveMatrix(const std::string filename, const MatrixType& m) {
     saveMatrix(filename.c_str(), m);
   }
 
+  /**!
+   * Load Eigen matrix from file
+   *
+   * @param filename source file
+   * @param m destination
+   */
   template<typename MatrixType>
   static void loadMatrix(const std::string filename, MatrixType& m) {
     loadMatrix(filename.c_str(), m);
   }
 
-  // workarround for robodev1 (older Eigen)
+  /**!
+   * Workarround for robodev1 (older Eigen)
+   *
+   * @return true if structure contains NaN values
+   */
   template<typename Derived>
   inline static bool hasNaN(const Eigen::DenseBase<Derived> &o)
   {
     return !((o.derived().array()==o.derived().array()).all());
   }
 
-  // workarround for robodev1 (older Eigen)
+  /**!
+   * Workarround for robodev1 (older Eigen)
+   *
+   * @return true if structure contains INFINITE of NaN values
+   */
   template<typename Derived>
   inline static bool allFinite(const Eigen::DenseBase<Derived> &o) {
     return !(hasNaN(o.derived()-o.derived()));

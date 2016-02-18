@@ -25,37 +25,47 @@
 #define TERMINATION_H_
 
 #include <boost/circular_buffer.hpp>
-#include <boost/range/numeric.hpp>
 
-#include <but_velodyne_odom/Stopwatch.h>
+#include <but_velodyne/Stopwatch.h>
 
-namespace but_velodyne_odom
+namespace but_velodyne
 {
 
+/**!
+ * Standard deviation of the registration error.
+ */
 class ErrorDeviation {
 public:
+
+  /**!
+   * @param iterations how many iterations should be considered
+   */
   ErrorDeviation(int iterations) :
     last_errors(iterations) {
   }
 
+  /**!
+   * Adds the new error value after the iteration of registration algorithm
+   *
+   * @param error new error value
+   */
   void add(float error) {
     last_errors.push_back(error);
   }
 
-  float getDeviation() {
-    float sum_squares = 0;
-    float mean = getMean();
-    for(boost::circular_buffer<float>::iterator e = last_errors.begin();
-        e < last_errors.end(); e++) {
-      sum_squares += pow(*e - mean, 2);
-    }
-    return sqrt(sum_squares / last_errors.size());
-  }
+  /**!
+   * @return the standard deviation of the error in last N iterations
+   */
+  float getDeviation() const;
 
-  float getMean() {
-    return std::accumulate(last_errors.begin(), last_errors.end(), 0.0) / last_errors.size();
-  }
+  /**!
+   * @return the mean error of last N iterations
+   */
+  float getMean() const;
 
+  /**!
+   * @return true off the error deviation is over the threshold value
+   */
   bool isSignificant(float threshold) {
     return (last_errors.size() != last_errors.capacity()) ||
         (getDeviation() > threshold);
@@ -64,15 +74,36 @@ private:
   boost::circular_buffer<float> last_errors;
 };
 
-
+/**!
+ * Criteria for termination of the iterative algorithm.
+ * Algorithm is terminated when one of the following criteria is met:
+ *  - algorithm exceeded maximal number of iterations
+ *  - algorithm exceeded time resources given
+ *  - standard deviation of the error yielded from last N iterations is insignificant
+ *  - error from the last iteration is bellow the threshold
+ */
 class Termination
 {
 public:
+
+  /**!
+   * @param min_iterations minimal number of the iterations
+   * @param max_iterations maximum iterations
+   * @param max_time_spent maximum time resources for the algorithm
+   * @param min_err_deviation minimal standard deviation of the error allowed (computed from multiple iterations of algorithm)
+   * @param min_error minimal algorithm error
+   */
   Termination(int min_iterations, int max_iterations, float max_time_spent,
               float min_err_deviation, float min_error);
 
+  /**!
+   * Add the error from the last algorithm iteration.
+   */
   void addNewError(float error);
 
+  /**!
+   * @return true if algorithm should be terminated
+   */
   bool operator()();
 private:
   Stopwatch stopwatch;
@@ -86,6 +117,6 @@ private:
   int iterations;
 };
 
-} /* namespace but_velodyne_odom */
+} /* namespace but_velodyne */
 
 #endif /* TERMINATION_H_ */
