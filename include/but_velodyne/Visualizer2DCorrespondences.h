@@ -24,24 +24,48 @@
 #ifndef VISUALISATION_H_
 #define VISUALISATION_H_
 
-#include <but_velodyne_odom/Correspondence.h>
-#include <but_velodyne_odom/ImageLine.h>
-#include <but_velodyne_odom/PointCloudLine.h>
+#include <but_velodyne/Correspondence.h>
+#include <but_velodyne/ImageLine.h>
+#include <but_velodyne/PointCloudLine.h>
 
-namespace but_velodyne_odom {
+namespace but_velodyne {
 
+/**!
+ * Visualization of the corresponding lines in 2D.
+ */
 class Visualizer2DCorrespondences {
 public:
+
+  /**!
+   * @param source_image source image used as a background for visualization
+   * @param target_image target image used as a background for visualization
+   */
   Visualizer2DCorrespondences(
       const cv::Mat &source_image,
       const cv::Mat &target_image
   );
 
+  /**!
+   * Show the correspondences among 2D lines.
+   *
+   * @param source_lines lines from source image
+   * @param target_lines lines from target image
+   * @param matches correspondences already found among 2D lines
+   */
   void viewLineCorrespondences(
       const std::vector<ImageLine> &source_lines,
       const std::vector<ImageLine> &target_lines,
       const std::vector<cv::DMatch> &matches);
 
+  /**!
+   * Show the correspondences among 3D lines on the 2D plane.
+   *
+   * @param source_lines lines from the source observation
+   * @param target_lines lines from the target observation
+   * @param matches correspondences already found among 3D lines
+   * @param projection_matrix 3x4 projection matrix (intrinsic and extrinsic camera parameters)
+   * @param transformation 3D transformation from source to target coordinate system
+   */
   bool view3DLineCorrenspondences(
       const std::vector<PointCloudLine> &source_lines,
       const std::vector<PointCloudLine> &target_lines,
@@ -59,6 +83,6 @@ protected:
   cv::RNG& rng;
 };
 
-} /* namespace but_velodyne_odom */
+} /* namespace but_velodyne */
 
 #endif /* VISUALISATION_H_ */

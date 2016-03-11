@@ -24,15 +24,27 @@
 #ifndef CORRESPONDENCEMERGE_H_
 #define CORRESPONDENCEMERGE_H_
 
-#include <but_velodyne_odom/Correspondence.h>
-#include <but_velodyne_odom/VelodynePointCloud.h>
-#include <but_velodyne_odom/Stopwatch.h>
+#include <but_velodyne/Correspondence.h>
+#include <but_velodyne/VelodynePointCloud.h>
+#include <but_velodyne/Stopwatch.h>
 
-namespace but_velodyne_odom {
+namespace but_velodyne {
 
+/**!
+ * Re-projector of image correspondences to the 3D space.
+ */
 class KeypointsCorrespondenceProjector
 {
 public:
+
+  /**!
+   * @param _source_image previous image frame
+   * @param _target_image current image frame
+   * @param _source_cloud previous LiDAR point cloud frame
+   * @param _target_cloud current LiDAR point cloud frame
+   * @param projection_matrix intrinsic camera parameters
+   * @param _images_correspondences input matches of image key-points
+   */
   KeypointsCorrespondenceProjector(cv::Mat _source_image,
                           cv::Mat _target_image,
                           VelodynePointCloud _source_cloud,
@@ -56,6 +68,9 @@ public:
                                                _target_image))
   { }
 
+  /**!
+   * @return correspondences between source and target point cloud based on the matches of 2D key-points
+   */
   std::vector<Correspondence3D> findLidarCorrespondences();
 
 protected:
@@ -79,8 +94,6 @@ protected:
       const cv::Mat &target_indicies,
       const cv::Mat &target_distances);
 
-  ////////////////////////   Initializers:   ////////////////////////
-
   static std::vector<Correspondence3D2D> projectLidarData(
       const VelodynePointCloud &point_cloud,
       const cv::Mat &projection_matrix,
@@ -91,7 +104,7 @@ protected:
     using namespace pcl;
 
     Stopwatch stopwatch;
-    stopwatch.start();
+    stopwatch.restart();
 
     //Mat imageToProject = image.clone();
     Rect frame(0, 0, image.cols, image.rows);

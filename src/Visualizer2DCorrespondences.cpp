@@ -28,14 +28,14 @@
 #include <cv.h>
 #include <highgui.h>
 
-#include <but_velodyne_odom/Visualizer2DCorrespondences.h>
+#include <but_velodyne/Visualizer2DCorrespondences.h>
 
 using namespace pcl;
 using namespace cv;
 using namespace std;
 using namespace velodyne_pointcloud;
 
-namespace but_velodyne_odom {
+namespace but_velodyne {
 
 Visualizer2DCorrespondences::Visualizer2DCorrespondences(
     const cv::Mat &source_image,
@@ -96,7 +96,7 @@ bool Visualizer2DCorrespondences::view3DLineCorrenspondences(
     ImageLine target_img_line = target_line.project(projection_matrix, imageFrame);
 
     float t_distance = source_line.distanceTo(target_line.transform(transformation),
-                                              PointCloudLine::EUCLIDIAN);
+                                              PointCloudLine::EUCLIDEAN);
     float r_distance = source_line.distanceTo(target_line.transform(transformation),
                                               PointCloudLine::COSINE_ORIENTATION);
 

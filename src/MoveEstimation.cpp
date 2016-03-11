@@ -21,10 +21,78 @@
  * along with this file.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <but_velodyne_odom/MoveEstimation.h>
+#include <but_velodyne/MoveEstimation.h>
 
-namespace but_velodyne_odom
+namespace but_velodyne
 {
+
+/* **************************** MoveParameters **************************** */
+
+MoveParameters MoveParameters::operator +(const MoveParameters &other) const {
+  return MoveParameters(
+    x + other.x,
+    y + other.y,
+    z + other.z,
+    roll + other.roll,
+    pitch + other.pitch,
+    yaw + other.yaw);
+}
+
+MoveParameters MoveParameters::operator *(float factor) const {
+  return MoveParameters(
+      x * factor,
+      y * factor,
+      z * factor,
+      roll * factor,
+      pitch * factor,
+      yaw * factor);
+}
+
+MoveParameters MoveParameters::operator -(const MoveParameters &other) const {
+  return *this + (other * -1.0f);
+}
+
+void MoveParameters::operator +=(const MoveParameters &other) {
+  x += other.x;
+  y += other.y;
+  z += other.z;
+  roll += other.roll;
+  pitch += other.pitch;
+  yaw += other.yaw;
+}
+
+void MoveParameters::operator /=(float factor) {
+  x /= factor;
+  y /= factor;
+  z /= factor;
+  roll /= factor;
+  pitch /= factor;
+  yaw /= factor;
+}
+
+void MoveParameters::operator *=(float factor) {
+  x *= factor;
+  y *= factor;
+  z *= factor;
+  roll *= factor;
+  pitch *= factor;
+  yaw *= factor;
+}
+
+void MoveParameters::setZeros() {
+  *this *= 0.0;
+}
+
+cv::Mat MoveParameters::toCvMat() const {
+  cv::Mat measurements(6, 1, CV_64F);
+  measurements.at<double>(0) = x;
+  measurements.at<double>(1) = y;
+  measurements.at<double>(2) = z;
+  measurements.at<double>(3) = roll;
+  measurements.at<double>(4) = pitch;
+  measurements.at<double>(5) = yaw;
+  return measurements;
+}
 
 /* **************************** LinearMoveEstimator **************************** */
 
@@ -166,4 +234,4 @@ Eigen::Matrix4f MoveEstimation::predict() {
       prediction.yaw).matrix();
 }
 
-} /* namespace but_velodyne_odom */
+} /* namespace but_velodyne */

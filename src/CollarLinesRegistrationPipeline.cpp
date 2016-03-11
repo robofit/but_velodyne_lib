@@ -21,19 +21,16 @@
  * along with this file.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <but_velodyne_odom/CollarLinesRegistrationPipeline.h>
-#include <but_velodyne_odom/PoseGraphEdge.h>
+#include <but_velodyne/CollarLinesRegistrationPipeline.h>
+#include <but_velodyne/PoseGraphEdge.h>
 
 using namespace std;
 using namespace pcl;
 using namespace cv;
 using namespace velodyne_pointcloud;
 
-namespace but_velodyne_odom
+namespace but_velodyne
 {
-
-KalmanMoveEstimator CollarLinesRegistrationPipeline::kalman_estimator(1e-5, 1e-4, 1.0);
-LinearMoveEstimator CollarLinesRegistrationPipeline::linear_estimator(3);
 
 Eigen::Matrix4f CollarLinesRegistrationPipeline::registerTwoGrids(const PolarGridOfClouds &source,
                                                const PolarGridOfClouds &target,
@@ -41,22 +38,20 @@ Eigen::Matrix4f CollarLinesRegistrationPipeline::registerTwoGrids(const PolarGri
                                                int &iterations,
                                                float &error) {
   iterations = 0;
-  Termination termination(minIterations, maxIterations, maxTimeSpent,
-                          SIGNIFICANT_DEVIATION, TARGET_ERROR);
+  Termination termination(pipeline_params.minIterations, pipeline_params.maxIterations, pipeline_params.maxTimeSpent,
+                          pipeline_params.significantErrorDeviation, pipeline_params.targetError);
   Eigen::Matrix4f transformation = initial_transformation;
   while(!termination()) {
 
-    LineCloud source_line_cloud(source, linesPerCellGenerated,
-                                linesPerCellPreserved, LineCloud::NONE);
-    LineCloud target_line_cloud(target, linesPerCellGenerated,
-                                linesPerCellPreserved, LineCloud::NONE);
+    LineCloud source_line_cloud(source, pipeline_params.linesPerCellGenerated,
+                                pipeline_params.linesPerCellPreserved, pipeline_params.preservedFactorOfLinesBy);
+    LineCloud target_line_cloud(target, pipeline_params.linesPerCellGenerated,
+                                pipeline_params.linesPerCellPreserved, pipeline_params.preservedFactorOfLinesBy);
 
     CollarLinesRegistration icl_fitting(source_line_cloud, target_line_cloud,
-                                          CollarLinesRegistration::MEDIAN_THRESHOLD,
-                                          weights_by,
-                                          transformation);
+                                        registration_params, transformation);
     for(int sampling_it = 0;
-        (sampling_it < iterationsPerSampling) && !termination();
+        (sampling_it < pipeline_params.iterationsPerSampling) && !termination();
         sampling_it++) {
       error = icl_fitting.refine();
       termination.addNewError(error);
@@ -71,7 +66,7 @@ vector<Eigen::Matrix4f> CollarLinesRegistrationPipeline::runRegistrationEffectiv
     const PolarGridOfClouds::Ptr &target_grid_cloud) {
 
   assert(!history.empty());
-  stopwatch.start();
+  stopwatch.restart();
 
   Eigen::Matrix4f transformation = getPrediction();
   vector<Eigen::Matrix4f> results;
@@ -97,18 +92,15 @@ Eigen::Matrix4f CollarLinesRegistrationPipeline::pickBestByError(const PolarGrid
                                               const vector<Eigen::Matrix4f> &transformations) {
   float best_error = INFINITY;
   Eigen::Matrix4f best_transform;
-  LineCloud source(*(history.front().getGridCloud()), linesPerCellGenerated,
-                   linesPerCellPreserved, LineCloud::NONE);
-  LineCloud target(*target_cloud, linesPerCellGenerated,
-                   linesPerCellPreserved, LineCloud::NONE);
+  LineCloud source(*(history.front().getGridCloud()), pipeline_params.linesPerCellGenerated,
+                   pipeline_params.linesPerCellPreserved, pipeline_params.preservedFactorOfLinesBy);
+  LineCloud target(*target_cloud, pipeline_params.linesPerCellGenerated,
+                   pipeline_params.linesPerCellPreserved, pipeline_params.preservedFactorOfLinesBy);
   int i = 0;
   int best_index = -1;
   for(vector<Eigen::Matrix4f>::const_iterator t = transformations.begin();
       t < transformations.end(); t++, i++) {
-    CollarLinesRegistration icl_fitting(source, target,
-                                          CollarLinesRegistration::MEDIAN_THRESHOLD,
-                                          CollarLinesRegistration::NO_WEIGHTS,
-                                          *t);
+    CollarLinesRegistration icl_fitting(source, target, registration_params, *t);
     float error = icl_fitting.computeError();
     if(error < best_error) {
       best_error = error;
@@ -162,4 +154,30 @@ Eigen::Matrix4f CollarLinesRegistrationPipeline::runRegistration(const VelodyneP
   return transformation;
 }
 
-} /* namespace but_velodyne_odom */
+void CollarLinesRegistrationPipeline::output(const Eigen::Matrix4f &transformation) {
+  cumulated_transformation = cumulated_transformation * transformation;
+
+  Eigen::Matrix4f::Scalar *pose = cumulated_transformation.data();
+  std::cout << pose[0] << " " << pose[4] << " " << pose[8]  << " " << pose[12] <<
+        " " << pose[1] << " " << pose[5] << " " << pose[9]  << " " << pose[13] <<
+        " " << pose[2] << " " << pose[6] << " " << pose[10] << " " << pose[14] << std::endl;
+}
+
+Eigen::Matrix4f CollarLinesRegistrationPipeline::getPrediction() {
+  Eigen::Matrix4f prediction = estimation.predict();
+  log << "Prediction:" << std::endl << prediction << std::endl << std::endl;
+  return prediction;
+}
+
+void CollarLinesRegistrationPipeline::printInfo(float time, int iterations, Eigen::Matrix4f t, float error) {
+  log << std::endl <<
+      "TOTAL" << std::endl <<
+      " * time: " << time << "s" << std::endl <<
+      " * iterations: " << iterations << std::endl <<
+      " * error: " << error << std::endl <<
+      "Transformation:" << std::endl << t << std::endl <<
+      "*******************************************************************************" <<
+      std::endl << std::flush;
+}
+
+} /* namespace but_velodyne */

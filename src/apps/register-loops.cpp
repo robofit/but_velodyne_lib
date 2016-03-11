@@ -41,17 +41,17 @@
 #include <pcl/keypoints/uniform_sampling.h>
 #include <pcl/io/pcd_io.h>
 
-#include <but_velodyne_odom/VelodynePointCloud.h>
-#include <but_velodyne_odom/Visualizer3D.h>
-#include <but_velodyne_odom/KittiUtils.h>
-#include <but_velodyne_odom/EigenUtils.h>
-#include <but_velodyne_odom/CollarLinesRegistrationPipeline.h>
-#include <but_velodyne_odom/PoseGraphEdge.h>
+#include <but_velodyne/VelodynePointCloud.h>
+#include <but_velodyne/Visualizer3D.h>
+#include <but_velodyne/KittiUtils.h>
+#include <but_velodyne/EigenUtils.h>
+#include <but_velodyne/CollarLinesRegistrationPipeline.h>
+#include <but_velodyne/PoseGraphEdge.h>
 
 using namespace std;
 using namespace cv;
 using namespace pcl;
-using namespace but_velodyne_odom;
+using namespace but_velodyne;
 
 void check(bool condition, string what) {
   if(!condition) {
@@ -194,14 +194,23 @@ int main(int argc, char** argv)
 
       transformPointCloud(target, target, init_rotation);
 
-      CollarLinesRegistrationPipeline registration(CollarLinesRegistrationPipeline::linear_estimator, cerr);
-      registration.setWeightsBy(CollarLinesRegistration::VERTICAL_ANGLE_WEIGHTS);
-      registration.setLinesPerCellGenerated(10);
-      registration.setLinesPerCellPreserved(2);
-      registration.setMaxIterations(2000);
-      registration.setMaxTimeSpent(20);
-      registration.setIterationsPerSampling(50);
-      registration.setMinIterations(201);
+      CollarLinesRegistration::Parameters registration_parameters(
+          CollarLinesRegistration::MEDIAN_THRESHOLD,
+          CollarLinesRegistration::VERTICAL_ANGLE_WEIGHTS
+      );
+      CollarLinesRegistrationPipeline::Parameters pipeline_parameters(
+          10,   // generated
+          2,    // preserved
+          LineCloud::NONE,
+          201,  // min iterations
+          2000, // max iterations
+          20,   // max time spent
+          50    // iterations per sampling
+      );
+
+      LinearMoveEstimator linear_estimator(3);
+      CollarLinesRegistrationPipeline registration(linear_estimator, cerr,
+                                                   pipeline_parameters, registration_parameters);
       Mat covariance;
       registration.runRegistration(source, covariance);
       Eigen::Matrix4f t = registration.runRegistration(target, covariance);     // only zeros

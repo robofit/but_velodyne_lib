@@ -21,7 +21,7 @@
  * along with this file.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <but_velodyne_odom/VelodynePointCloud.h>
+#include <but_velodyne/VelodynePointCloud.h>
 
 #include <vector>
 #include <cstdlib>
@@ -37,7 +37,7 @@ using namespace velodyne_pointcloud;
 using namespace std;
 using namespace cv;
 
-namespace but_velodyne_odom {
+namespace but_velodyne {
 
 void VelodynePointCloud::normalizeIntensity(float min_intensity, float max_intensity)
 {

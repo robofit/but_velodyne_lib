@@ -35,14 +35,14 @@
 #include <pcl/common/eigen.h>
 #include <pcl/common/transforms.h>
 
-#include <but_velodyne_odom/Visualizer3D.h>
-#include <but_velodyne_odom/KittiUtils.h>
-#include <but_velodyne_odom/PoseGraphEdge.h>
+#include <but_velodyne/Visualizer3D.h>
+#include <but_velodyne/KittiUtils.h>
+#include <but_velodyne/PoseGraphEdge.h>
 
 using namespace std;
 using namespace cv;
 using namespace pcl;
-using namespace but_velodyne_odom;
+using namespace but_velodyne;
 
 // experimentally set thresholds
 float MAX_FEAT_DISTANCE = 3;

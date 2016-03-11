@@ -29,61 +29,119 @@
 #include <pcl/point_cloud.h>
 #include <pcl/kdtree/kdtree_flann.h>
 
-#include <but_velodyne_odom/LineCloud.h>
-#include <but_velodyne_odom/Visualizer3D.h>
+#include <but_velodyne/LineCloud.h>
+#include <but_velodyne/Visualizer3D.h>
 
-namespace but_velodyne_odom
+namespace but_velodyne
 {
-
+/**!
+ * Registration of two collar line clouds.
+ */
 class CollarLinesRegistration
 {
   typedef Eigen::Vector3f TPoint3D;
   typedef Eigen::Matrix<TPoint3D::Scalar, TPoint3D::RowsAtCompileTime, Eigen::Dynamic> MatrixOfPoints;
   typedef Eigen::DiagonalMatrix<TPoint3D::Scalar, Eigen::Dynamic, Eigen::Dynamic> WeightsMatrix;
 public:
+
+  /**!
+   * How the weights are assigned to the collar line matches.
+   */
   enum Weights {
-    DISTANCE_WEIGHTS,
-    VERTICAL_ANGLE_WEIGHTS,
-    NO_WEIGHTS
+    DISTANCE_WEIGHTS,           // matches of close lines are more significant
+    VERTICAL_ANGLE_WEIGHTS,     // matches of vertical lines are more significant
+    NO_WEIGHTS                  // all line matches are equal
   };
 
-  CollarLinesRegistration(const LineCloud &source_cloud,
-                            const LineCloud &target_cloud,
-                            const int distancce_threshold,
-                            const enum Weights weighting,
-                            const Eigen::Matrix4f initial_transformation = Eigen::Matrix4f::Identity()) :
-    source_cloud(source_cloud), target_cloud(target_cloud),
-    initial_transformation(initial_transformation),
+  friend std::istream& operator>> (std::istream &in, Weights &weightning);
+
+  /**!
+   * How the threshold for line matches filtering is estimated.
+   */
+  enum Threshold {
+      MEDIAN_THRESHOLD,         // all matches with distance above median are discarded
+      MEAN_THRESHOLD,           // threshold = mean
+      NO_THRESHOLD              // no thresholding - all matches are preserved
+  };
+
+  friend std::istream& operator>> (std::istream &in, Threshold &thresholding);
+
+  /**!
+   * Options of registration.
+   */
+  class Parameters
+  {
+  public:
+    Parameters(
+        Threshold distance_threshold_ = MEDIAN_THRESHOLD,
+        Weights weighting_ = NO_WEIGHTS,
+        int correnspPerLineMatch_ = 1,
+        float lineCorrenspSigma_ = 0.0001) :
+        distance_threshold(distance_threshold_),
+        weighting(weighting_),
+        correnspPerLineMatch(correnspPerLineMatch_),
+        lineCorrenspSigma(lineCorrenspSigma_){
+    }
+    Threshold distance_threshold;       /// how is the threshold of line matches distance estimated
+    Weights weighting;                  /// optional weighting of line matches
+    int correnspPerLineMatch;           /// [Experimental] how many corresponding points are generated per line match
+    float lineCorrenspSigma;            /// [Experimental] deviation of Gaussian noise added to the point correspondences
+  } params;
+
+  /**!
+   * @param source_cloud_ the line cloud from time T
+   * @param target_cloud_ the line cloud from time T+1
+   * @param params_ parameters of registration
+   * @param initial_transformation_ predicted transformation for initialization
+   */
+  CollarLinesRegistration(const LineCloud &source_cloud_,
+                            const LineCloud &target_cloud_,
+                            const Parameters params_,
+                            const Eigen::Matrix4f initial_transformation_ = Eigen::Matrix4f::Identity()) :
+    source_cloud(source_cloud_), target_cloud(target_cloud_),
+    initial_transformation(initial_transformation_),
+    params(params_),
     transformation(Eigen::Matrix4f::Identity()),
-    distance_threshold(distancce_threshold), weighting(weighting),
     matching_time(0), correnspondences_time(0), tranformation_time(0), error_time(0) {
 
     source_kdtree.setInputCloud(source_cloud.line_middles.makeShared());
     this->target_cloud.transform(initial_transformation);
   }
 
+  /**!
+   * Run iteration of the registration process.
+   *
+   * @return average distance (error) of the matching lines
+   */
   float refine();
 
+  /**!
+   * @return matches of collar lines between source (train indices) and target (queries) cloud
+   */
   std::vector<cv::DMatch> getMatches() {
     return matches;
   }
 
+  /**!
+   * @return transformation estimated so far
+   */
   const Eigen::Matrix4f getTransformation() const
   {
-    //std::cerr << "refined_transf" << std::endl << transformation << std::endl;
-    //std::cerr << "initial_transf" << std::endl << initial_transformation << std::endl;
     return initial_transformation * transformation;
   }
 
+  /**!
+   * Visualize line correspondences found in last iteration
+   */
   void showLinesCorrenspondences();
 
+  /**!
+   * @return error (average distance of matching lines) of the last iteration
+   */
   float computeError();
 
+  // time counters measuring how much the each step of registration process costs
   float matching_time, correnspondences_time, tranformation_time, error_time;
-
-  static const int MEDIAN_THRESHOLD = -1;
-  static const int MEAN_THRESHOLD = -2;
-  static const int NO_THRESHOLD = -3;
 
 protected:
   void findClosestMatchesByMiddles();
@@ -119,13 +177,8 @@ private:
   Eigen::Matrix4f initial_transformation;
   Eigen::Matrix4f transformation;
   Eigen::VectorXf correspondences_weights;
-  float const distance_threshold;
-  const Weights weighting;
-
-  static const int correnspPerLineMatch = 10;
-  static const float lineCorrenspSigma = 0.1;        // mostly within 10cm
 };
 
-} /* namespace but_velodyne_odom */
+} /* namespace but_velodyne */
 
 #endif /* ITERATIVELINEPLANEFITTING_H_ */

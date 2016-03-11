@@ -27,21 +27,36 @@
 #include <cv.h>
 #include <pcl/common/eigen.h>
 
-#include <but_velodyne_odom/MoveEstimation.h>
+#include <but_velodyne/MoveEstimation.h>
 
-namespace but_velodyne_odom
+namespace but_velodyne
 {
 
+/**!
+ * The edge (representing transformation) in the pose graph
+ * connecting two vertices (two positions).
+ */
 class PoseGraphEdge
 {
 public:
 
+  /**!
+   * @param sourceIdx ID of source vertex the edge is connected to
+   * @param targetIdx ID of target vertex the edge is connected to
+   * @param transformation transformation between the positions (vertices)
+   * @param covariance covariance matrix for SLAM++ (how much the algorithm trusts the edge)
+   */
   PoseGraphEdge(int sourceIdx, int targetIdx,
                 const Eigen::Matrix4f transformation, const cv::Mat &covariance) :
     sourceIdx(sourceIdx), targetIdx(targetIdx),
     transformation(transformation), covariance(covariance) {
   }
 
+  /**!
+   * @param sourceIdx ID of source vertex the edge is connected to
+   * @param targetIdx ID of target vertex the edge is connected to
+   * @param transformation transformation between the positions (vertices)
+   */
   PoseGraphEdge(int sourceIdx, int targetIdx,
                 const Eigen::Matrix4f transformation) :
     sourceIdx(sourceIdx), targetIdx(targetIdx),
@@ -49,6 +64,9 @@ public:
     MoveParameters::getDummyCovariance(0.01, 0.02, covariance);
   }
 
+  /**!
+   * Ordering of the edges by vertices indices.
+   */
   bool operator<(const PoseGraphEdge &other) const {
     if(this->sourceIdx == other.sourceIdx) {
       return this->targetIdx < other.targetIdx;
@@ -56,15 +74,18 @@ public:
     return this->sourceIdx < other.sourceIdx;
   }
 
-  int sourceIdx;
-  int targetIdx;
-  Eigen::Matrix4f transformation;
-  cv::Mat covariance;
+  int sourceIdx;                        ///! ID of source vertex the edge is connected to
+  int targetIdx;                        ///! ID of target vertex the edge is connected to
+  Eigen::Matrix4f transformation;       ///! transformation between the positions (vertices)
+  cv::Mat covariance;                   ///! covariance matrix for SLAM++ (how much the algorithm trusts the edge)
 };
 
-// EDGE3D sourceIdx targetIdx 6DOF(6 floats) upper-triange-of-cholesky-cov(21 floats)
+/**!
+ * Prints the edge in SLAM++ format:
+ * EDGE3D sourceIdx targetIdx 6DOF(6 floats) upper-triange-of-cholesky-cov(21 floats)
+ */
 std::ostream& operator<<(std::ostream &os, const PoseGraphEdge &obj);
 
-} /* namespace but_velodyne_odom */
+} /* namespace but_velodyne */
 
 #endif /* POSELOOP_H_ */

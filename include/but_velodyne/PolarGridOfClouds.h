@@ -29,26 +29,37 @@
 #include <cv.h>
 #include <pcl/common/eigen.h>
 
-#include <but_velodyne_odom/VelodynePointCloud.h>
+#include <but_velodyne/VelodynePointCloud.h>
 
-namespace but_velodyne_odom
+namespace but_velodyne
 {
 
+/**!
+ * Identifier of the polar cell.
+ */
 struct CellId {
-  int ring;
-  int polar;
+  int ring;     ///! Velodyne ring ID
+  int polar;    ///! discretized horizontal angle
 
   CellId(int p, int r) :
     ring(r), polar(p) {
   }
 };
 
+/**!
+ * Polar grid structure grouping the Velodyne 3D points of the same ring and the similar horizontal angle.
+ */
 class PolarGridOfClouds
 {
 public:
 
   typedef boost::shared_ptr<PolarGridOfClouds> Ptr;
 
+  /**!
+   * Redistributes the original 3D points into the polar grid structure
+   *
+   * @param point_cloud oroginal Velodyne point cloud
+   */
   PolarGridOfClouds(const pcl::PointCloud<velodyne_pointcloud::PointXYZIR> &point_cloud);
 
   static Ptr of(const pcl::PointCloud<velodyne_pointcloud::PointXYZIR> &point_cloud) {
@@ -56,15 +67,28 @@ public:
     return Ptr(grid);
   }
 
+  /**!
+   * Visualization of the grouping into the polar bins - same bin = same color.
+   */
   void showColored();
 
+  /**!
+   * @param cellId identifier of the cell
+   * @returns the points of the specific polar grid
+   */
   const VelodynePointCloud& operator[](const CellId &cellId) const {
     return polar_grid[cellId.polar][cellId.ring];
   }
 
+  /**!
+   * Transforms the positions of points in the grid structure. Distribution of points
+   * into the polar bins remains the same since only rigid transformation is assumed.
+   *
+   * @param t rigid 3D transformation [R|t]
+   */
   void transform(const Eigen::Matrix4f &t);
 
-  static const int POLAR_BINS = 36;     // 10deg each
+  static const int POLAR_BINS = 36;     //!! number of polar bins (10deg each)
 
 protected:
 
@@ -83,6 +107,6 @@ protected:
     POLAR_BINS > polar_grid;            // polar bins of rings
 };
 
-} /* namespace but_velodyne_odom */
+} /* namespace but_velodyne */
 
 #endif /* POLARGRIDOFCLOUDS_H_ */
