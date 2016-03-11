@@ -68,7 +68,7 @@ int main(int argc, char** argv) {
 	}
 
 	boost::filesystem::path first_cloud(clouds_to_process.front());
-	string graph_filename = first_cloud.parent_path().string() + "/poses.graph";
+	string graph_filename = first_cloud.parent_path().string() + "poses.graph";
 	ofstream graph_file(graph_filename.c_str());
 	if (!graph_file.is_open()) {
 		perror(graph_filename.c_str());
