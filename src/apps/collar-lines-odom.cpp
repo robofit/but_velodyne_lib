@@ -68,7 +68,13 @@ int main(int argc, char** argv) {
 	}
 
 	boost::filesystem::path first_cloud(clouds_to_process.front());
-	string graph_filename = first_cloud.parent_path().string() + "/poses.graph";
+    string output_path;
+    if (first_cloud.has_parent_path()) {
+        output_path = first_cloud.parent_path().string();
+    } else {
+        output_path =  boost::filesystem::current_path().string();
+    }
+    string graph_filename = output_path + "/poses.graph";
 	ofstream graph_file(graph_filename.c_str());
 	if (!graph_file.is_open()) {
 		perror(graph_filename.c_str());
@@ -97,7 +103,7 @@ int main(int argc, char** argv) {
 		registration.output(t);
 	}
 
-	string cov_filename = first_cloud.parent_path().string() + "/covariances.yaml";
+	string cov_filename = output_path + "/covariances.yaml";
 	FileStorage cov_fs(cov_filename, FileStorage::WRITE);
 	cov_fs << "covariances" << covariances;
 
