@@ -1,9 +1,22 @@
 cmake_minimum_required(VERSION 2.4.6)
+if(COMMAND cmake_policy)
+  cmake_policy(SET CMP0003 NEW)
+endif(COMMAND cmake_policy)
 
 project(but_velodyne_lib)
+set (BUT_VELODYNE_VERSION_MAJOR 0)
+set (BUT_VELODYNE_VERSION_MINOR 1)
+set (BUT_VELODYNE_VERSION_PATCH 0)
+set (BUT_VELODYNE_VERSION ${BUT_VELODYNE_VERSION_MAJOR}.${BUT_VELODYNE_VERSION_MINOR}.${BUT_VELODYNE_VERSION_PATCH})
+set (BUT_VELODYNE_SOVERSION ${BUT_VELODYNE_VERSION_MAJOR}.${BUT_VELODYNE_VERSION_MINOR})
+message(STATUS "Compiling But-Velodyne Version ${BUT_VELODYNE_VERSION}, soversion=${BUT_VELODYNE_SOVERSION}")
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3")
-set(CMAKE_BUILD_TYPE RELEASE)
+set(LIB_SUFFIX CACHE STRING "suffix for the library directory need for x86-64 systems that use lib64 ")
+set(BUT_VELODYNE_INCLUDE_INSTALL_DIR "but_velodyne-${BUT_VELODYNE_VERSION_MAJOR}.${BUT_VELODYNE_VERSION_MINOR}" CACHE STRING "Directory name for header files")
+set(BUT_VELODYNE_CMAKE_INSTALL_DIR "but_velodyne-${BUT_VELODYNE_VERSION_MAJOR}.${BUT_VELODYNE_VERSION_MINOR}" CACHE STRING "Directory to install the cmake config files.")
+
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3")
+#set(CMAKE_BUILD_TYPE RELEASE)
 
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
@@ -29,6 +42,11 @@ FIND_PACKAGE(Boost 1.40 COMPONENTS program_options REQUIRED )
 INCLUDE_DIRECTORIES( ${Boost_INCLUDE_DIR} )
 
 ########################### Library: #########################################
+
+file(GLOB header_files ${CMAKE_CURRENT_SOURCE_DIR}/include/but_velodyne/*.h)
+install(FILES ${header_files} DESTINATION include/${BUT_VELODYNE_INCLUDE_INSTALL_DIR}/but_velodyne COMPONENT ${COMPONENT_PREFIX}dev)
+file(GLOB header_files ${CMAKE_CURRENT_SOURCE_DIR}/include/velodyne_pointcloud/*.h)
+install(FILES ${header_files} DESTINATION include/${BUT_VELODYNE_INCLUDE_INSTALL_DIR}/velodyne_pointcloud COMPONENT ${COMPONENT_PREFIX}dev)
 
 add_library(but_velodyne SHARED src/CollarLinesRegistration.cpp src/CollarLinesRegistrationPipeline.cpp
 src/ImageLine.cpp src/KeypointsCorrespondenceProjector.cpp src/LineCloud.cpp src/MoveEstimation.cpp
@@ -75,6 +93,11 @@ add_executable(sac-visual-registration src/apps/sac-visual-registration.cpp)
 target_link_libraries(sac-visual-registration but_velodyne)
 
 ########################## Installation: #####################################
+
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/but_velodyne-config.cmake.in" "${CMAKE_CURRENT_BINARY_DIR}/but_velodyne-config.cmake" IMMEDIATE @ONLY)
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/but_velodyne-config-version.cmake.in" "${CMAKE_CURRENT_BINARY_DIR}/but_velodyne-config-version.cmake" IMMEDIATE @ONLY)
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/but_velodyne-config.cmake" "${CMAKE_CURRENT_BINARY_DIR}/but_velodyne-config-version.cmake"
+    DESTINATION "lib${LIB_SUFFIX}/cmake/${BUT_VELODYNE_CMAKE_INSTALL_DIR}" COMPONENT ${COMPONENT_PREFIX}dev)
 
 install(
 TARGETS but_velodyne collar-lines-odom show-kitti-poses show_correspondences extract-vfh
