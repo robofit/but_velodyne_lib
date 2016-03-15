@@ -211,6 +211,10 @@ void KalmanMoveEstimator::addMeassurement(const MoveParameters &params) {
 MoveParameters KalmanMoveEstimator::predict() {
   return estimation;
 }
+const int KalmanMoveEstimator::STATES = 18;
+const int KalmanMoveEstimator::MEASSURES_STATES = 6;
+const int KalmanMoveEstimator::ACTION_CONTROLS = 0;
+const float KalmanMoveEstimator::TIME_DELTA = 0.1;         // 10fps
 
 /* ******************************* MoveEstimation ******************************* */
 

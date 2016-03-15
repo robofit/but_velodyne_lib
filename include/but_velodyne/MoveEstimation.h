@@ -161,10 +161,10 @@ private:
   cv::KalmanFilter KF;
   MoveParameters estimation;
 
-  static const int STATES = 18;
-  static const int MEASSURES_STATES = 6;
-  static const int ACTION_CONTROLS = 0;
-  static const float TIME_DELTA = 0.1;         // 10fps
+  static const int STATES;
+  static const int MEASSURES_STATES;
+  static const int ACTION_CONTROLS;
+  static const float TIME_DELTA;
 };
 
 /**!
