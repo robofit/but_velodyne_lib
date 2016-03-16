@@ -34,6 +34,7 @@
 
 #include <pcl/common/eigen.h>
 #include <pcl/common/transforms.h>
+#include <pcl/io/pcd_io.h>
 
 using namespace std;
 using namespace pcl;
@@ -90,7 +91,12 @@ int main(int argc, char** argv)
   for(int i = 0; i < argc-2; i++) {
     string kitti_scan = argv[i+2];
     cerr << "scan: " << kitti_scan << endl;
-    VelodynePointCloud::fromKitti(kitti_scan, cloud);
+    //VelodynePointCloud::fromKitti(kitti_scan, cloud);
+    if (kitti_scan.find(".pcd") != string::npos) {
+        pcl::io::loadPCDFile(kitti_scan, cloud);
+    } else {
+      VelodynePointCloud::fromKitti(kitti_scan, cloud);
+    }
 
     addVelodynePcl(visualizer, cloud, poses[i]);
   }
