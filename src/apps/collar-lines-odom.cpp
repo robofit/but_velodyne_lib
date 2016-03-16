@@ -90,7 +90,7 @@ int main(int argc, char** argv) {
 	for (int i = 0; i < clouds_to_process.size(); i++) {
 
 		string filename = clouds_to_process[i];
-		log << "KITTI file: " << filename << endl << flush;
+		BUT_VELODYNE_LOG << "KITTI file: " << filename << endl << flush;
 		if (filename.find(".pcd") != string::npos) {
 			io::loadPCDFile(filename, target_cloud);
 		} else {

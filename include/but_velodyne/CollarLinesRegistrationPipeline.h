@@ -43,7 +43,8 @@
 #include <but_velodyne/MoveEstimation.h>
 #include <but_velodyne/Termination.h>
 
-#define log cerr << getpid() << ": "
+#include <iostream>
+#define BUT_VELODYNE_LOG std::cerr << getpid() << ": "
 
 namespace but_velodyne
 {
