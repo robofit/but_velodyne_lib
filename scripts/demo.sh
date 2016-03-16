@@ -3,7 +3,7 @@
 SDIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 
 for i in $(seq 0 4); do
-	wget --no-check-certificate https://www.fit.vutbr.cz/~ivelas/files/kitti-sample/00000$i.bin
+	[ -f 00000$i.bin ] || wget --no-check-certificate https://www.fit.vutbr.cz/~ivelas/files/kitti-sample/00000$i.bin
 done
 
 odometry=$SDIR/../bin/collar-lines-odom
