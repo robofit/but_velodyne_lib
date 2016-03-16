@@ -1,0 +1,33 @@
+# Users can set the following variables before calling the module:
+# ButVELODYNE_DIR - The preferred installation prefix for searching for ButVELODYNE. Set by the user.
+#
+# ButVELODYNE_ROOT_DIR - the root directory where the installation can be found
+# ButVELODYNE_CXX_FLAGS - extra flags for compilation
+# ButVELODYNE_LINK_FLAGS - extra flags for linking
+# ButVELODYNE_INCLUDE_DIRS - include directories
+# ButVELODYNE_LIBRARY_DIRS - link directories
+# ButVELODYNE_LIBRARIES - libraries to link plugins with
+# ButVELODYNE_Boost_VERSION - the boost version but_velodyne was compiled with
+
+get_filename_component(_PREFIX "${CMAKE_CURRENT_LIST_FILE}" PATH)
+get_filename_component(_PREFIX "${_PREFIX}" PATH)
+get_filename_component(_PREFIX "${_PREFIX}" PATH)
+get_filename_component(ButVELODYNE_ROOT_DIR "${_PREFIX}" PATH)
+
+set( ButVELODYNE_CXX_FLAGS "-DBUT_VELODYNE_DLL @BUT_VELODYNE_EXPORT_CXXFLAGS@ @BUT_VELODYNE_BOOST_INCLUDE_DIRS@" )
+set( ButVELODYNE_LINK_FLAGS "@BUT_VELODYNE_BOOST_LIB_DIRS@" )
+set( ButVELODYNE_INCLUDE_DIRS "${ButVELODYNE_ROOT_DIR}/include/@BUT_VELODYNE_INCLUDE_INSTALL_DIR@")
+set( ButVELODYNE_LIBRARY_DIRS "${ButVELODYNE_ROOT_DIR}/lib@LIB_SUFFIX@")
+set( ButVELODYNE_LIBRARIES but_velodyne${ButVELODYNE_LIBRARY_SUFFIX})
+
+set( ButVELODYNE_Boost_VERSION "@Boost_MAJOR_VERSION@.@Boost_MINOR_VERSION@")
+
+mark_as_advanced(
+  ButVELODYNE_ROOT_DIR
+  ButVELODYNE_CXXFLAGS
+  ButVELODYNE_CXX_FLAGS
+  ButVELODYNE_LINK_FLAGS
+  ButVELODYNE_INCLUDE_DIRS
+  ButVELODYNE_LIBRARIES
+  ButVELODYNE_Boost_VERSION
+)
