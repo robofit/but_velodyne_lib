@@ -107,9 +107,9 @@ Eigen::Matrix4f CollarLinesRegistrationPipeline::pickBestByError(const PolarGrid
       best_transform = *t;
       best_index = i;
     }
-    log << "error of " << i << "th item: " << error << endl << flush;
+    BUT_VELODYNE_LOG << "error of " << i << "th item: " << error << endl << flush;
   }
-  log << "picked: " << best_index << "th" << endl << flush;
+  BUT_VELODYNE_LOG << "picked: " << best_index << "th" << endl << flush;
   return best_transform;
 }
 
@@ -165,12 +165,12 @@ void CollarLinesRegistrationPipeline::output(const Eigen::Matrix4f &transformati
 
 Eigen::Matrix4f CollarLinesRegistrationPipeline::getPrediction() {
   Eigen::Matrix4f prediction = estimation.predict();
-  log << "Prediction:" << std::endl << prediction << std::endl << std::endl;
+  BUT_VELODYNE_LOG << "Prediction:" << std::endl << prediction << std::endl << std::endl;
   return prediction;
 }
 
 void CollarLinesRegistrationPipeline::printInfo(float time, int iterations, Eigen::Matrix4f t, float error) {
-  log << std::endl <<
+  BUT_VELODYNE_LOG << std::endl <<
       "TOTAL" << std::endl <<
       " * time: " << time << "s" << std::endl <<
       " * iterations: " << iterations << std::endl <<
