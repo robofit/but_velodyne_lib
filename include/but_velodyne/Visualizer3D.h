@@ -26,7 +26,12 @@
 
 #include <iostream>
 
-#include <cv.h>
+#include "opencv2/core/version.hpp"
+#if CV_MAJOR_VERSION == 3
+	#include <opencv/cv.hpp>
+#else
+	#include <cv.h>
+#endif
 
 #include <pcl/common/eigen.h>
 #include <pcl/common/transforms.h>
@@ -253,7 +258,7 @@ public:
    * @return *this instance with visual loops added for visualization
    */
   Visualizer3D& addPosesLoops(const vector<Eigen::Affine3f> &poses,
-                              cv::vector<cv::DMatch> matches = cv::vector<cv::DMatch>());
+                              std::vector<cv::DMatch> matches = std::vector<cv::DMatch>());
 
   /**!
    * Shows the interactive visualization of the all elements added.

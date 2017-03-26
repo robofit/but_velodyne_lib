@@ -31,7 +31,12 @@
 #include <but_velodyne/Visualizer3D.h>
 #include <but_velodyne/KittiUtils.h>
 
-#include <cv.h>
+#include "opencv2/core/version.hpp"
+#if CV_MAJOR_VERSION == 3
+	#include <opencv/cv.hpp>
+#else
+	#include <cv.h>
+#endif
 
 #include <pcl/common/distances.h>
 #include <pcl/common/eigen.h>

@@ -155,7 +155,7 @@ Visualizer3D& Visualizer3D::keepOnlyClouds(int clouds_to_preserve) {
 }
 
 Visualizer3D& Visualizer3D::addPosesLoops(const vector<Eigen::Affine3f> &poses,
-                                 cv::vector<cv::DMatch> matches) {
+                                 std::vector<cv::DMatch> matches) {
   PointXYZ to(0, 0, 0);
   for(int i = 1; i < poses.size(); i++) {
     PointXYZ from = to;

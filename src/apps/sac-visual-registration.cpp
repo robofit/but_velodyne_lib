@@ -27,8 +27,16 @@
 
 #include <velodyne_pointcloud/point_types.h>
 
-#include <opencv/cv.h>
-#include <opencv/highgui.h>
+#include "opencv2/core/version.hpp"
+#if CV_MAJOR_VERSION == 3
+	#include <opencv/cv.hpp>
+    #include <opencv2/highgui.hpp>
+    #include <opencv2/features2d.hpp>
+    #include "opencv2/xfeatures2d.hpp"
+#else
+	#include <cv.h>
+	#include <highgui.h>
+#endif
 
 #include <pcl/point_cloud.h>
 #include <pcl/io/pcd_io.h>
@@ -60,12 +68,20 @@ std::vector<Correspondence2D> findImageCorrespondences(
   using namespace cv;
   using namespace std;
 
+#if CV_MAJOR_VERSION == 3
+  Ptr<FeatureDetector> feat_detector = ORB::create();
+  Ptr<DescriptorExtractor> feat_extractor = ORB::create();
+  vector<KeyPoint> source_keypoints, target_keypoints;
+  feat_detector->detect(source_image, source_keypoints);
+  feat_detector->detect(target_image, target_keypoints);
+#else
   ORB feat_detector;
+  Ptr<DescriptorExtractor> feat_extractor = DescriptorExtractor::create("ORB");
   vector<KeyPoint> source_keypoints, target_keypoints;
   feat_detector.detect(source_image, source_keypoints);
   feat_detector.detect(target_image, target_keypoints);
+#endif
 
-  Ptr<DescriptorExtractor> feat_extractor = DescriptorExtractor::create("ORB");
   Mat source_descriptors, target_descriptors;
   feat_extractor->compute(source_image, source_keypoints, source_descriptors);
   feat_extractor->compute(target_image, target_keypoints, target_descriptors);

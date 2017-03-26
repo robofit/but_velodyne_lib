@@ -33,7 +33,12 @@
 
 #include <pcl/common/eigen.h>
 #include <boost/program_options.hpp>
-#include <cv.h>
+#include "opencv2/core/version.hpp"
+#if CV_MAJOR_VERSION == 3
+	#include <opencv/cv.hpp>
+#else
+	#include <cv.h>
+#endif
 
 #include <but_velodyne/VelodynePointCloud.h>
 #include <but_velodyne/EigenUtils.h>

@@ -24,7 +24,12 @@
 #ifndef _CORRESPONDENCE_H_
 #define _CORRESPONDENCE_H_
 
-#include <cv.h>
+#include "opencv2/core/version.hpp"
+#if CV_MAJOR_VERSION == 3
+	#include <opencv/cv.hpp>
+#else
+	#include <cv.h>
+#endif
 #include <velodyne_pointcloud/point_types.h>
 #include <but_velodyne/PointCloudLine.h>
 

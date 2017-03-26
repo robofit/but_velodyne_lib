@@ -22,9 +22,17 @@
  */
 
 #include <vector>
+#include "opencv2/core/version.hpp"
+#if CV_MAJOR_VERSION == 3
+	#include <opencv/cv.hpp>
+	#include <opencv2/imgproc.hpp>
+    #include <opencv2/highgui.hpp>
+    #include <opencv2/flann.hpp>
+#else
+	#include <cv.h>
+	#include <highgui.h>
+#endif
 
-#include <cv.h>
-#include <highgui.h>
 
 #include <but_velodyne/VelodynePointCloud.h>
 #include <but_velodyne/KeypointsCorrespondenceProjector.h>

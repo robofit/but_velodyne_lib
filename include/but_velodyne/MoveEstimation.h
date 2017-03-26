@@ -24,11 +24,20 @@
 #ifndef MOVEESTIMATION_H_
 #define MOVEESTIMATION_H_
 
-#include <cv.h>
+#include "opencv2/core/version.hpp"
+#if CV_MAJOR_VERSION == 3
+	#include <opencv/cv.hpp>
+	#include "opencv2/video/tracking.hpp"
+#else
+	#include <cv.h>
+#endif
+
 
 #include <pcl/common/eigen.h>
 #include <boost/circular_buffer.hpp>
 #include <boost/range/numeric.hpp>
+
+
 
 namespace but_velodyne
 {

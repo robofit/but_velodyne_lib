@@ -24,7 +24,12 @@
 #ifndef POSELOOP_H_
 #define POSELOOP_H_
 
-#include <cv.h>
+#include "opencv2/core/version.hpp"
+#if CV_MAJOR_VERSION == 3
+	#include <opencv/cv.hpp>
+#else
+	#include <cv.h>
+#endif
 #include <pcl/common/eigen.h>
 
 #include <but_velodyne/MoveEstimation.h>

@@ -298,7 +298,7 @@ Eigen::Matrix4f CollarLinesRegistration::computeTransformationWeighted(
   centroid_1 << source_points_weighted.row(0).sum(),
       source_points_weighted.row(1).sum(), source_points_weighted.row(2).sum();
 
-  Eigen::Matrix<TPoint3D::Scalar, 1, Eigen::Dynamic, Eigen::Aligned> identity_vec = Eigen::Matrix<TPoint3D::Scalar, 1,
+  Eigen::Matrix<TPoint3D::Scalar, 1, Eigen::Dynamic> identity_vec= Eigen::Matrix<TPoint3D::Scalar, 1,
       Eigen::Dynamic>::Ones(1, target_coresp_points.cols()); //setOnes();
 
   // Create matrix with repeating values in columns
