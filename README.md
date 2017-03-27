@@ -12,7 +12,7 @@ Currently, the odometry estimation is main contribution of this repository. Avai
 Library requires following dependencies to be installed in the system:
 
  * Eigen3 library
- * OpenCV (version 2.4.9 used)
+ * OpenCV version 2.4.9 (for OpenCV v3 compatibility see branch opencv3)
  * and PCL 1.7 library.
 
 As a simple CMake project, it can be built by executing:
