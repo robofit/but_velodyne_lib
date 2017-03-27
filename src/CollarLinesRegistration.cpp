@@ -269,8 +269,9 @@ void CollarLinesRegistration::getWeightingMatrix(WeightsMatrix &weighting_matrix
     weighting_matrix.diagonal() /= (float)matches.size()*params.correnspPerLineMatch;
     return;
   }
-
-  correspondences_weights /= correspondences_weights.sum();
+  
+  float sum=correspondences_weights.sum();
+  correspondences_weights = correspondences_weights/sum;
 
   assert(weighting_matrix.rows() == correspondences_weights.size());
   assert(weighting_matrix.cols() == correspondences_weights.size());
