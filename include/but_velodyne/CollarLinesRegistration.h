@@ -24,7 +24,12 @@
 #ifndef ITERATIVELINEPLANEFITTING_H_
 #define ITERATIVELINEPLANEFITTING_H_
 
-#include <cv.h>
+#include "opencv2/core/version.hpp"
+#if CV_MAJOR_VERSION == 3
+	#include <opencv/cv.hpp>
+#else
+	#include <cv.h>
+#endif
 #include <pcl/common/eigen.h>
 #include <pcl/point_cloud.h>
 #include <pcl/kdtree/kdtree_flann.h>

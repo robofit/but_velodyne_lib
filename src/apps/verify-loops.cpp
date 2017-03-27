@@ -29,8 +29,14 @@
 #include <sstream>
 #include <iostream>
 
-#include <cv.h>
-#include <highgui.h>
+#include "opencv2/core/version.hpp"
+#if CV_MAJOR_VERSION == 3
+	#include <opencv/cv.hpp>
+    #include <opencv2/highgui.hpp>
+#else
+	#include <cv.h>
+	#include <highgui.h>
+#endif
 
 #include <pcl/common/eigen.h>
 #include <pcl/common/transforms.h>
@@ -55,14 +61,14 @@ void check(bool condition, string what) {
   }
 }
 
-cv::vector<cv::DMatch> loadMatches(const string &matches_filename) {
+std::vector<cv::DMatch> loadMatches(const string &matches_filename) {
   std::ifstream file(matches_filename.c_str());
   if(!file.is_open()) {
     std::perror((std::string("Unable to open file: ") + matches_filename).c_str());
     exit(1);
   }
 
-  cv::vector<cv::DMatch> matches;
+  std::vector<cv::DMatch> matches;
   while(true) {
     int train, query;
     float feat_dist, space_dist, gt_dist;

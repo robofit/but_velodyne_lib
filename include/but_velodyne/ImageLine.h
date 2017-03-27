@@ -25,7 +25,12 @@
 #define IMAGELINEDETECTOR_H_
 
 
-#include <cv.h>
+#include "opencv2/core/version.hpp"
+#if CV_MAJOR_VERSION == 3
+	#include <opencv/cv.hpp>
+#else
+	#include <cv.h>
+#endif
 #include <velodyne_pointcloud/point_types.h>
 
 namespace but_velodyne {

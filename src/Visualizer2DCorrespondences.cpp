@@ -25,8 +25,14 @@
 #include <pcl/common/transforms.h>
 #include <pcl/visualization/cloud_viewer.h>
 
-#include <cv.h>
-#include <highgui.h>
+#include "opencv2/core/version.hpp"
+#if CV_MAJOR_VERSION == 3
+	#include <opencv/cv.hpp>
+    #include <opencv2/highgui.hpp>
+#else
+	#include <cv.h>
+	#include <highgui.h>
+#endif
 
 #include <but_velodyne/Visualizer2DCorrespondences.h>
 

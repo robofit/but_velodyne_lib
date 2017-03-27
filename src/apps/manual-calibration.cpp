@@ -23,8 +23,14 @@
  * along with this file.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <cv.h>
-#include <highgui.h>
+#include "opencv2/core/version.hpp"
+#if CV_MAJOR_VERSION == 3
+	#include <opencv/cv.hpp>
+    #include <opencv2/highgui.hpp>
+#else
+	#include <cv.h>
+	#include <highgui.h>
+#endif
 #include <pcl/point_cloud.h>
 #include <pcl/io/pcd_io.h>
 #include <pcl/common/eigen.h>

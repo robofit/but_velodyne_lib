@@ -29,7 +29,12 @@
 #include <pcl/point_cloud.h>
 #include <velodyne_pointcloud/point_types.h>
 
-#include <cv.h>
+#include "opencv2/core/version.hpp"
+#if CV_MAJOR_VERSION == 3
+	#include <opencv/cv.hpp>
+#else
+	#include <cv.h>
+#endif
 
 namespace but_velodyne {
 
